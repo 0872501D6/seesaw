@@ -171,7 +171,7 @@ func (ra *radiusAttribute) decode(b *bytes.Reader) error {
 	if length == 2 {
 		return nil
 	}
-	ra.value = make([]byte, length-2)
+	ra.value = make([]byte, int(length)-2)
 	n, err := b.Read(ra.value)
 	if err != nil {
 		return err
@@ -207,10 +207,10 @@ func (rp *radiusPacket) decode(b *bytes.Reader) error {
 	if rp.Length < radiusHeaderSize || rp.Length > radiusMaximumSize {
 		return fmt.Errorf("invalid length %d", rp.Length)
 	}
-	len := rp.Length - radiusHeaderSize
+	length := rp.Length - radiusHeaderSize
 	rp.attributes = make([]*radiusAttribute, 0)
 	for {
-		if len < 2 {
+		if length < 2 {
 			break
 		}
 		attribute := &radiusAttribute{}
@@ -218,7 +218,7 @@ func (rp *radiusPacket) decode(b *bytes.Reader) error {
 			return err
 		}
 		rp.attributes = append(rp.attributes, attribute)
-		len -= uint16(attribute.length)
+		length -= uint16(attribute.length)
 	}
 	return nil
 }
